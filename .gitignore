@@ -2,4 +2,5 @@
 .gradle
 build
 
-src/main/java/Practice1/credentials.json
+src/main/resources/credentials.json
+tokens/StoredCredential
