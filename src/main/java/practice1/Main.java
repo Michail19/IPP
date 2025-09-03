@@ -26,11 +26,9 @@ public class Main {
     private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
     private static final String TOKENS_DIRECTORY_PATH = "tokens";
 
-    /** Scopes. Можно менять: readonly, send, compose и т.д. */
     private static final List<String> SCOPES = Collections.singletonList(GmailScopes.GMAIL_READONLY);
     private static final String CREDENTIALS_FILE_PATH = "/credentials.json";
 
-    /** Загружаем OAuth2 credentials */
     private static Credential getCredentials(final com.google.api.client.http.HttpTransport HTTP_TRANSPORT) throws IOException {
         InputStream in = Main.class.getResourceAsStream(CREDENTIALS_FILE_PATH);
         if (in == null) {
@@ -52,14 +50,13 @@ public class Main {
                 .setApplicationName(APPLICATION_NAME)
                 .build();
 
-        // Получаем список писем
         ListMessagesResponse messagesResponse = service.users().messages().list("me").setMaxResults(10L).execute();
         List<Message> messages = messagesResponse.getMessages();
 
         if (messages == null || messages.isEmpty()) {
-            System.out.println("Нет сообщений.");
+            System.out.println("No messages.");
         } else {
-            System.out.println("Последние письма:");
+            System.out.println("Recent emails:");
             for (Message msg : messages) {
                 Message fullMessage = service.users().messages().get("me", msg.getId()).execute();
                 System.out.println("ID: " + fullMessage.getId() + " | Snippet: " + fullMessage.getSnippet());
