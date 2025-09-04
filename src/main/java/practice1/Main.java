@@ -51,33 +51,6 @@ public class Main {
         return messagesResponse.getMessages();
     }
 
-    public static String getMessageBody(Message message) {
-        StringBuilder body = new StringBuilder();
-
-        if (message.getPayload().getParts() == null) {
-            body.append(decodeBody(message.getPayload().getBody()));
-        } else {
-            for (MessagePart part : message.getPayload().getParts()) {
-                if (part.getMimeType().equals("text/plain")) {
-                    body.append(decodeBody(part.getBody()));
-                }
-            }
-        }
-        return body.toString();
-    }
-
-    private static String decodeBody(MessagePartBody body) {
-        if (body == null || body.getData() == null) {
-            return "";
-        }
-        byte[] decodedBytes = Base64.getUrlDecoder().decode(body.getData());
-        try {
-            return new String(decodedBytes, java.nio.charset.StandardCharsets.UTF_8);
-        } catch (Exception e) {
-            return "[Error of decoding]";
-        }
-    }
-
     public static void main(String... args) throws IOException, GeneralSecurityException {
         var HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
         Gmail service = new Gmail.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
@@ -92,8 +65,7 @@ public class Main {
             System.out.println("Recent emails:");
             for (Message msg : messages) {
                 Message fullMessage = service.users().messages().get("me", msg.getId()).execute();
-                String messageBody = getMessageBody(fullMessage);
-                System.out.println("ID: " + fullMessage.getId() + " | Segment: " + messageBody);
+                System.out.println("ID: " + fullMessage.getId() + " | Segment: " + fullMessage.getSnippet());
             }
         }
     }
