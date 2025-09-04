@@ -12,13 +12,16 @@ import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.GmailScopes;
 import com.google.api.services.gmail.model.*;
+import jakarta.mail.MessagingException;
+import jakarta.mail.Session;
+import jakarta.mail.internet.InternetAddress;
+import jakarta.mail.internet.MimeMessage;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.security.GeneralSecurityException;
+import java.util.Base64;
 import java.util.List;
+import java.util.Properties;
 
 public class Main {
     private static final String APPLICATION_NAME = "Gmail API Java 11";
@@ -49,7 +52,7 @@ public class Main {
         return messagesResponse.getMessages();
     }
 
-    public static void main(String... args) throws IOException, GeneralSecurityException {
+    public static void main(String... args) throws IOException, GeneralSecurityException, MessagingException {
         var HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
         Gmail service = new Gmail.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
                 .setApplicationName(APPLICATION_NAME)
@@ -66,5 +69,15 @@ public class Main {
                 System.out.println("ID: " + fullMessage.getId() + " | Segment: " + fullMessage.getSnippet());
             }
         }
+
+        MimeMessage email = GmailDraft.createEmail(
+                "recipient@example.com",
+                "me@example.com",
+                "Тестовый черновик",
+                "Привет! Это письмо сохранено как черновик."
+        );
+
+        Draft draft = GmailDraft.createDraft(service, "me", email);
+        System.out.println("Черновик создан, ID: " + draft.getId());
     }
 }
