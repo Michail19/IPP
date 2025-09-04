@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.security.GeneralSecurityException;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
 
@@ -26,7 +27,9 @@ public class Main {
     private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
     private static final String TOKENS_DIRECTORY_PATH = "tokens";
 
-    private static final List<String> SCOPES = Collections.singletonList(GmailScopes.GMAIL_READONLY);
+    private static final List<String> SCOPES = List.of(GmailScopes.GMAIL_READONLY,
+            GmailScopes.GMAIL_COMPOSE,
+            GmailScopes.GMAIL_LABELS);
     private static final String CREDENTIALS_FILE_PATH = "/credentials.json";
 
     private static Credential getCredentials(final com.google.api.client.http.HttpTransport HTTP_TRANSPORT) throws IOException {
@@ -35,13 +38,44 @@ public class Main {
             throw new FileNotFoundException("Resource not found: " + CREDENTIALS_FILE_PATH);
         }
         GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
-                HTTP_TRANSPORT, JSON_FACTORY, GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(in)),
-                SCOPES)
+                HTTP_TRANSPORT, JSON_FACTORY, GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(in)), SCOPES)
                 .setDataStoreFactory(new FileDataStoreFactory(new java.io.File(TOKENS_DIRECTORY_PATH)))
                 .setAccessType("offline")
                 .build();
         LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(8888).build();
         return new AuthorizationCodeInstalledApp(flow, receiver).authorize("user");
+    }
+
+    public static List<Message> getMessages(Gmail service) throws IOException {
+        ListMessagesResponse messagesResponse = service.users().messages().list("me").setMaxResults(10L).execute();
+        return messagesResponse.getMessages();
+    }
+
+    public static String getMessageBody(Message message) {
+        StringBuilder body = new StringBuilder();
+
+        if (message.getPayload().getParts() == null) {
+            body.append(decodeBody(message.getPayload().getBody()));
+        } else {
+            for (MessagePart part : message.getPayload().getParts()) {
+                if (part.getMimeType().equals("text/plain")) {
+                    body.append(decodeBody(part.getBody()));
+                }
+            }
+        }
+        return body.toString();
+    }
+
+    private static String decodeBody(MessagePartBody body) {
+        if (body == null || body.getData() == null) {
+            return "";
+        }
+        byte[] decodedBytes = Base64.getUrlDecoder().decode(body.getData());
+        try {
+            return new String(decodedBytes, java.nio.charset.StandardCharsets.UTF_8);
+        } catch (Exception e) {
+            return "[Error of decoding]";
+        }
     }
 
     public static void main(String... args) throws IOException, GeneralSecurityException {
@@ -50,8 +84,7 @@ public class Main {
                 .setApplicationName(APPLICATION_NAME)
                 .build();
 
-        ListMessagesResponse messagesResponse = service.users().messages().list("me").setMaxResults(10L).execute();
-        List<Message> messages = messagesResponse.getMessages();
+        List<Message> messages = getMessages(service);
 
         if (messages == null || messages.isEmpty()) {
             System.out.println("No messages.");
@@ -59,7 +92,8 @@ public class Main {
             System.out.println("Recent emails:");
             for (Message msg : messages) {
                 Message fullMessage = service.users().messages().get("me", msg.getId()).execute();
-                System.out.println("ID: " + fullMessage.getId() + " | Snippet: " + fullMessage.getSnippet());
+                String messageBody = getMessageBody(fullMessage);
+                System.out.println("ID: " + fullMessage.getId() + " | Segment: " + messageBody);
             }
         }
     }
