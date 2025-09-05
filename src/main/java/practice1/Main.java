@@ -83,5 +83,9 @@ public class Main {
         GmailDraft.updateEmailWithAdd(email, "Новый текст");
         draft = GmailDraft.updateDraft(service, "me", draft.getId(), email);
         System.out.println("Черновик обновлён, ID: " + draft.getId());
+
+        Draft draftFofDelete = GmailDraft.createDraft(service, "me", email);
+        System.out.println("Черновик удалён, ID: " + draftFofDelete.getId());
+        GmailDraft.deleteDraft(service, "me", draftFofDelete.getId());
     }
 }

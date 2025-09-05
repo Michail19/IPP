@@ -72,4 +72,8 @@ public class GmailDraft {
 
         return service.users().drafts().update(userId, draftId, existingDraft).execute();
     }
+
+    public static void deleteDraft(Gmail service, String userId, String draftId) throws IOException {
+        service.users().drafts().delete(userId, draftId).execute();
+    }
 }
