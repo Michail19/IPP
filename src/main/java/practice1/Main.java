@@ -30,7 +30,8 @@ public class Main {
 
     private static final List<String> SCOPES = List.of(GmailScopes.GMAIL_READONLY,
             GmailScopes.GMAIL_COMPOSE,
-            GmailScopes.GMAIL_LABELS);
+            GmailScopes.GMAIL_LABELS,
+            GmailScopes.GMAIL_MODIFY  );
     private static final String CREDENTIALS_FILE_PATH = "/credentials.json";
 
     private static Credential getCredentials(final com.google.api.client.http.HttpTransport HTTP_TRANSPORT) throws IOException {
@@ -87,5 +88,25 @@ public class Main {
         Draft draftFofDelete = GmailDraft.createDraft(service, "me", email);
         System.out.println("Черновик удалён, ID: " + draftFofDelete.getId());
         GmailDraft.deleteDraft(service, "me", draftFofDelete.getId());
+
+
+        GmailLabels labelService = new GmailLabels();
+
+        GmailLabels.printAllLabels(service);
+
+        Label newLabel = GmailLabels.createLabel(service, "Проект X", "#000000", "#ffffff");
+        System.out.println("Created label: " + newLabel.getName());
+
+        if (!messages.isEmpty()) {
+            String firstMessageId = messages.get(0).getId();
+            GmailLabels.addLabelToMessageByName(service, firstMessageId, "Проект X");
+            System.out.println("Label added to message");
+
+            List<Label> messageLabels = labelService.getMessageLabels(service, firstMessageId);
+            System.out.println("Message labels:");
+            for (Label label : messageLabels) {
+                System.out.println("- " + label.getName());
+            }
+        }
     }
 }
