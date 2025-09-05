@@ -70,14 +70,18 @@ public class Main {
             }
         }
 
+
         MimeMessage email = GmailDraft.createEmail(
-                "recipient@example.com",
+                "somebody@example.com",
                 "me@example.com",
                 "Тестовый черновик",
                 "Привет! Это письмо сохранено как черновик."
         );
-
         Draft draft = GmailDraft.createDraft(service, "me", email);
         System.out.println("Черновик создан, ID: " + draft.getId());
+
+        GmailDraft.updateEmailWithAdd(email, "Новый текст");
+        draft = GmailDraft.updateDraft(service, "me", draft.getId(), email);
+        System.out.println("Черновик обновлён, ID: " + draft.getId());
     }
 }
