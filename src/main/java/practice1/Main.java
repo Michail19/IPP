@@ -61,12 +61,12 @@ public class Main {
         List<Message> messages = getMessages(service);
 
         if (messages == null || messages.isEmpty()) {
-            System.out.println("No messages.");
+            System.out.println("Нет сообщений.");
         } else {
-            System.out.println("Recent emails:");
+            System.out.println("Последние письма:");
             for (Message msg : messages) {
                 Message fullMessage = service.users().messages().get("me", msg.getId()).execute();
-                System.out.println("ID: " + fullMessage.getId() + " | Segment: " + fullMessage.getSnippet());
+                System.out.println("ID: " + fullMessage.getId() + " | Отрезок: " + fullMessage.getSnippet());
             }
         }
 
