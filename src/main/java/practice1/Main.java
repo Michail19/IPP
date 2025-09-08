@@ -53,7 +53,7 @@ public class Main {
         return messagesResponse.getMessages();
     }
 
-    public static void main(String... args) throws IOException, GeneralSecurityException, MessagingException {
+    public static void main(String[] args) throws IOException, GeneralSecurityException, MessagingException {
         var HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
         Gmail service = new Gmail.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
                 .setApplicationName(APPLICATION_NAME)
@@ -74,7 +74,7 @@ public class Main {
 
         MimeMessage email = GmailDraft.createEmail(
                 "somebody@example.com",
-                "me@example.com",
+                "moyakk340@gmail.com",
                 "Тестовый черновик",
                 "Привет! Это письмо сохранено как черновик."
         );
