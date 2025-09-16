@@ -1,0 +1,32 @@
+<!doctype html>
+<html>
+<meta charset="UTF-8">
+<head>
+    <title>Карскас страницы с погодой</title>
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script>
+        $.getJSON('config.json')
+            .done(function(config) {
+                var settings = {
+                    "url": `https://api.openweathermap.org/data/2.5/weather?q=Moscow&units=metric&appid=${config.API_KEY}`,
+                    "method": "GET",
+                    "timeout": 0,
+                };
+                $.ajax(settings).done(function(response, xhr) {
+                    console.log(response.main);
+                    console.log("Return Code: " + xhr.status);
+                    var content = response.main.temp;
+                    $("#Temp").append(content);
+                });
+            })
+            .fail(function() {
+                console.error("Ошибка загрузки конфигурации");
+            });
+    </script>
+</head>
+<body>
+<h1>Страница с погодой</h1>
+temp: <span id="Temp"></span>
+</body>
+</html>
