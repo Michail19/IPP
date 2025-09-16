@@ -14,10 +14,13 @@
                     "timeout": 0,
                 };
                 $.ajax(settings).done(function(response, xhr) {
-                    console.log(response.main);
                     console.log("Return Code: " + xhr.status);
-                    var content = response.main.temp;
-                    $("#Temp").append(content);
+                    var content = response.main;
+                    $("#Temp").append(content.temp);
+                    $("#MaxTemp").append(content.temp_max);
+                    $("#MinTemp").append(content.temp_min);
+                    $("#Bar").append(content.pressure);
+                    $("#Wind").append(response.wind.speed);
                 });
             })
             .fail(function() {
@@ -27,6 +30,10 @@
 </head>
 <body>
 <h1>Страница с погодой</h1>
-temp: <span id="Temp"></span>
+<div>temp: <span id="Temp"></span></div>
+<div>max temp: <span id="MaxTemp"></span></div>
+<div>min temp: <span id="MinTemp"></span></div>
+<div>pressure: <span id="Bar"></span></div>
+<div>wind: <span id="Wind"></span></div>
 </body>
 </html>
