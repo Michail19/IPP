@@ -1,6 +1,6 @@
 .idea
-.gradle
+Task1/.gradle
 build
 
-src/main/resources/credentials.json
-tokens/StoredCredential
+Task1/src/main/resources/credentials.json
+Task1/tokens/StoredCredential
