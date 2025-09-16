@@ -26,7 +26,7 @@ import java.util.Properties;
 public class Main {
     private static final String APPLICATION_NAME = "Gmail API Java 11";
     private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
-    private static final String TOKENS_DIRECTORY_PATH = "tokens";
+    private static final String TOKENS_DIRECTORY_PATH = "Task1/tokens";
 
     private static final List<String> SCOPES = List.of(GmailScopes.GMAIL_READONLY,
             GmailScopes.GMAIL_COMPOSE,
@@ -41,7 +41,8 @@ public class Main {
         }
         GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
                 HTTP_TRANSPORT, JSON_FACTORY, GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(in)), SCOPES)
-                .setDataStoreFactory(new FileDataStoreFactory(new java.io.File(TOKENS_DIRECTORY_PATH)))
+                .setDataStoreFactory(new FileDataStoreFactory(new File(TOKENS_DIRECTORY_PATH)))
+                .setAccessType("offline")
                 .build();
         LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(8888).build();
         return new AuthorizationCodeInstalledApp(flow, receiver).authorize("user");
@@ -52,7 +53,7 @@ public class Main {
         return messagesResponse.getMessages();
     }
 
-    public static void main(String[] args) throws IOException, GeneralSecurityException, MessagingException {
+    public static void main(String... args) throws IOException, GeneralSecurityException, MessagingException {
         var HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
         Gmail service = new Gmail.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
                 .setApplicationName(APPLICATION_NAME)
@@ -73,7 +74,7 @@ public class Main {
 
         MimeMessage email = GmailDraft.createEmail(
                 "somebody@example.com",
-                "moyakk340@gmail.com",
+                "me@example.com",
                 "Тестовый черновик",
                 "Привет! Это письмо сохранено как черновик."
         );
