@@ -1,18 +1,26 @@
-import java.net.http.*;
-import java.net.URI;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
+import java.util.Properties;
 
 public class ApiCurrencyLayer {
     private static final String API_URL = "http://api.currencylayer.com/live";
     private static final String API_URL_1 = "http://api.currencylayer.com/list";
     private static final String API_URL_2 = "http://api.currencylayer.com/historical";
     private static final String API_URL_3 = "http://api.currencylayer.com/timeframe";
-    private static final String API_KEY = "bcfb9f28e78e8707b4a32b647a43caa7";
 
     public static void main(String[] args) {
         try {
+            Properties props = new Properties();
+            try (FileInputStream in = new FileInputStream("./Task2\\src\\config.properties")) {
+                props.load(in);
+            }
+            final String API_KEY = props.getProperty("currencylayer.api.key");
+
             String url = API_URL + "?access_key=" + API_KEY + "&currencies=EUR,GBP&format=1";
 
             HttpClient client = HttpClient.newHttpClient();

@@ -4,3 +4,5 @@ build
 
 Task1/src/main/resources/credentials.json
 Task1/tokens/StoredCredential
+Task2/src/config.properties
+out/production/Task2/config.properties
