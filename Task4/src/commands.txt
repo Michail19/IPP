@@ -1,0 +1,8 @@
+npm install -g json-server --save
+json-server --watch database.json
+
+---
+
+http://localhost:3000/employees
+http://localhost:3000/employees?email=ivan@email.ru
+http://localhost:3000/employees?_sort=first_name
