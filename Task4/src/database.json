@@ -1,0 +1,28 @@
+{
+  "employees": [
+    {
+      "id": 0,
+      "first_name": "Иван",
+      "last_name": "Иванов",
+      "email": "ivan@email.ru"
+    },
+    {
+      "id": 1,
+      "first_name": "Пётр",
+      "last_name": "Петров",
+      "email": "petr@email.ru"
+    },
+    {
+      "id": 2,
+      "first_name": "Виктор",
+      "last_name": "Петров",
+      "email": "viktor@email.ru"
+    },
+    {
+      "id": 3,
+      "first_name": "Андрей",
+      "last_name": "Александров",
+      "email": "aleksendrov@email.ru"
+    }
+  ]
+}
