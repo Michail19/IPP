@@ -1,0 +1,53 @@
+"Marks the field, argument, input field or enum value as deprecated"
+directive @deprecated(
+    "The reason for the deprecation"
+    reason: String = "No longer supported"
+  ) on FIELD_DEFINITION | ARGUMENT_DEFINITION | ENUM_VALUE | INPUT_FIELD_DEFINITION
+
+"Directs the executor to include this field or fragment only when the `if` argument is true"
+directive @include(
+    "Included when true."
+    if: Boolean!
+  ) on FIELD | FRAGMENT_SPREAD | INLINE_FRAGMENT
+
+"Indicates an Input Object is a OneOf Input Object."
+directive @oneOf on INPUT_OBJECT
+
+"Directs the executor to skip this field or fragment when the `if` argument is true."
+directive @skip(
+    "Skipped when true."
+    if: Boolean!
+  ) on FIELD | FRAGMENT_SPREAD | INLINE_FRAGMENT
+
+"Exposes a URL that specifies the behaviour of this scalar."
+directive @specifiedBy(
+    "The URL that specifies the behaviour of this scalar."
+    url: String!
+  ) on SCALAR
+
+type Car {
+  age: Int!
+  brand: String!
+  id: ID!
+  price: Float!
+  title: String!
+}
+
+type Mutation {
+  createCar(carInput: CarInput!): Car!
+  deleteCar(id: ID!): Boolean!
+  updateCar(carInput: CarInput!, id: ID!): Car!
+}
+
+type Query {
+  getAllCars: [Car!]!
+  getCarById(id: ID!): Car
+  getCarsByBrand(brand: String!): [Car!]!
+}
+
+input CarInput {
+  age: Int!
+  brand: String!
+  price: Float!
+  title: String!
+}
