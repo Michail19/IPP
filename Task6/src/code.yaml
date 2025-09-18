@@ -1,0 +1,352 @@
+openapi: 3.0.0
+info:
+  title: GamerHub Store API
+  description: API for an online computer game store. Allows browsing games, user registration, and purchasing.
+  version: 1.0.0
+servers:
+  - url: http://localhost:4010
+    description: Development mock server
+
+paths:
+  /games:
+    get:
+      summary: Get a list of all games
+      description: Returns a list of games, optionally filtered by genre or developer.
+      tags:
+        - Games
+      parameters:
+        - in: query
+          name: genre
+          schema:
+            type: string
+          description: Filter games by genre (e.g., 'RPG', 'Action')
+        - in: query
+          name: developer
+          schema:
+            type: string
+          description: Filter games by developer name
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Game'
+        '500':
+          description: Internal server error
+    post:
+      summary: Add a new game to the store (Admin only)
+      description: |
+        Creates a new game in the catalog. Requires admin privileges.
+      tags:
+        - Games
+      security:
+        - BearerAuth: [ ]
+      requestBody:
+        required: true
+        description: Game object that needs to be added to the store
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GameCreate'
+      responses:
+        '201':
+          description: Game successfully created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Game'
+          headers:
+            Location:
+              description: URL of the created game
+              schema:
+                type: string
+                format: uri
+                example: http://localhost:4010/games/42
+        '400':
+          description: Invalid input
+        '401':
+          description: Unauthorized - Missing or invalid token
+        '403':
+          description: Forbidden - User is not an admin
+        '500':
+          description: Internal server error
+  /games/{gameId}:
+    get:
+      summary: Get a game by its ID
+      description: Returns detailed information about a single game.
+      tags:
+        - Games
+      parameters:
+        - in: path
+          name: gameId
+          required: true
+          description: Numeric ID of the game to retrieve.
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Successful operation. Game found and returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Game'
+        '400':
+          description: Bad Request - Invalid ID supplied (e.g., not a number).
+        '404':
+          description: Game not found. No game exists with the provided ID.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '500':
+          description: Internal Server Error
+    put:
+      summary: Update an existing game (Admin only)
+      description: Updates the details of a specific game by ID. Requires admin privileges.
+      tags:
+        - Games
+      security:
+        - BearerAuth: [ ]
+      parameters:
+        - in: path
+          name: gameId
+          required: true
+          description: ID of the game to update
+          schema:
+            type: integer
+            format: int64
+            example: 42
+      requestBody:
+        required: true
+        description: Updated game object
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GameUpdate'
+      responses:
+        '200':
+          description: Game successfully updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Game'
+        '400':
+          description: Invalid input or ID
+        '401':
+          description: Unauthorized - Missing or invalid token
+        '403':
+          description: Forbidden - User is not an admin
+        '404':
+          description: Game not found
+        '500':
+          description: Internal server error
+    delete:
+      summary: Delete a game from the catalog (Admin only)
+      description: Deletes a specific game by ID. Requires admin privileges.
+      tags:
+        - Games
+      security:
+        - BearerAuth: [ ]
+      parameters:
+        - in: path
+          name: gameId
+          required: true
+          description: ID of the game to delete
+          schema:
+            type: integer
+            format: int64
+            example: 42
+      responses:
+        '204':
+          description: Game successfully deleted (no content returned)
+        '401':
+          description: Unauthorized - Missing or invalid token
+        '403':
+          description: Forbidden - User is not an admin
+        '404':
+          description: Game not found
+        '500':
+          description: Internal server error
+  /users/register:
+    post:
+      summary: Register a new user
+      tags:
+        - Users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCreate'
+      responses:
+        '201':
+          description: User successfully created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Invalid input (e.g., email already exists, username taken)
+        '500':
+          description: Internal server error
+  /users/login:
+    post:
+      summary: Authenticate a user and receive a JWT token
+      tags:
+        - Users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  format: password
+      responses:
+        '200':
+          description: Successful login
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                  user:
+                    $ref: '#/components/schemas/User'
+        '401':
+          description: Unauthorized - Invalid email or password
+        '500':
+          description: Internal server error
+
+components:
+  schemas:
+    Game:
+      type: object
+      required:
+        - title
+        - price
+      properties:
+        id:
+          type: integer
+          format: int64
+          readOnly: true
+          example: 42
+        title:
+          type: string
+        description:
+          type: string
+        price:
+          type: number
+          format: float
+          minimum: 0
+        genre:
+          type: string
+        releaseDate:
+          type: string
+          format: date
+        developer:
+          type: string
+        imageUrl:
+          type: string
+          format: uri
+    GameCreate:
+      type: object
+      required:
+        - title
+        - price
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        price:
+          type: number
+          format: float
+          minimum: 0
+        genre:
+          type: string
+        releaseDate:
+          type: string
+          format: date
+        developer:
+          type: string
+        publisher:
+          type: string
+        imageUrl:
+          type: string
+          format: uri
+    GameUpdate:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        price:
+          type: number
+          format: float
+          minimum: 0
+        genre:
+          type: string
+        developer:
+          type: string
+        publisher:
+          type: string
+        imageUrl:
+          type: string
+          format: uri
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          readOnly: true
+        username:
+          type: string
+        email:
+          type: string
+          format: email
+        role:
+          type: string
+          enum: [ user, admin ]
+          default: user
+    UserCreate:
+      type: object
+      required:
+        - username
+        - email
+        - password
+      properties:
+        username:
+          type: string
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+          writeOnly: true
+
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
