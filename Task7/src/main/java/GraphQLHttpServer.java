@@ -4,11 +4,14 @@ import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 import graphql.ExecutionInput;
 import graphql.ExecutionResult;
+import graphql.schema.idl.SchemaPrinter;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -74,6 +77,10 @@ public class GraphQLHttpServer {
 
                 sendResponse(exchange, 200, objectMapper.writeValueAsString(response));
 
+                SchemaPrinter printer = new SchemaPrinter();
+                String schemaSDL = printer.print(carGraphQL.getGraphQL().getGraphQLSchema());
+
+                Files.writeString(Path.of("schema.graphqls"), schemaSDL);
             } catch (Exception e) {
                 sendResponse(exchange, 400, "{\"error\": \"" + e.getMessage() + "\"}");
             }
