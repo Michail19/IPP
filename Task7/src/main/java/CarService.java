@@ -47,7 +47,6 @@ public class CarService {
         return cars.remove(id) != null;
     }
 
-    // Инициализация тестовыми данными
     public void initializeTestData() {
         createCar("Toyota Camry", "Toyota", 25000.0, 2);
         createCar("BMW X5", "BMW", 65000.0, 1);
