@@ -73,7 +73,6 @@ public class CarGraphQL {
         return GraphQL.newGraphQL(graphQLSchema).build();
     }
 
-    // Data fetchers
     private List<Car> getAllCars(DataFetchingEnvironment env) {
         return carService.getAllCars();
     }

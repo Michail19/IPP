@@ -2,6 +2,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
+import graphql.ExecutionInput;
 import graphql.ExecutionResult;
 
 import java.io.IOException;
@@ -59,7 +60,11 @@ public class GraphQLHttpServer {
                     variables = new HashMap<>();
                 }
 
-                ExecutionResult executionResult = carGraphQL.getGraphQL().execute(query, null, null, variables);
+                ExecutionResult executionResult = carGraphQL.getGraphQL()
+                        .execute(ExecutionInput.newExecutionInput()
+                                .query(query)
+                                .variables(variables)
+                                .build());
 
                 Map<String, Object> response = new HashMap<>();
                 response.put("data", executionResult.getData());
