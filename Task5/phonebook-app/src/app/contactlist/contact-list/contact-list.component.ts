@@ -16,7 +16,7 @@ import { ContactDetailsComponent } from '../contact-details/contact-details.comp
 
 export class ContactListComponent implements OnInit {
   contacts: Contact[] = [];
-  selectedContact?: Contact;
+  selectedContact: Contact = { name: '', email: '', phone: { work: '', mobile: '' }, _id: '' };
 
   constructor(private contactService: ContactService) { }
 
@@ -33,7 +33,7 @@ export class ContactListComponent implements OnInit {
     return this.contacts.findIndex(c => c._id === contactId);
   }
 
-  selectContact(contact?: Contact) {
+  selectContact(contact: Contact) {
     this.selectedContact = contact;
   }
 
@@ -49,10 +49,12 @@ export class ContactListComponent implements OnInit {
 
   deleteContact = (contactId: string) => {
     const idx = this.getIndexOfContact(contactId);
-    if (idx !== -1) {
-      this.contacts.splice(idx, 1);
-      this.selectContact(undefined);
-    }
+    // if (idx !== -1) {
+    //   this.contacts.splice(idx, 1);
+    //   this.selectContact(undefined);
+    // }
+    if (idx !== -1) this.contacts.splice(idx, 1);
+    this.selectedContact = { name: '', email: '', phone: { work: '', mobile: '' }, _id: '' }; // пустой объект
   }
 
   addContact = (contact: Contact) => {
