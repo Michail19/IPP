@@ -6,7 +6,7 @@ import { Contact } from './contact';
 @Injectable({
   providedIn: 'root' // сервис регистрируется автоматически
 })
-export class ServiceAPI {
+export class ContactService {
   private APIUrl = '/v1/contact'; // базовый путь API
 
   constructor(private http: HttpClient) {}

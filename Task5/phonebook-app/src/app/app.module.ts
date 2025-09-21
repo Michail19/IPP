@@ -4,8 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 
 import { AppComponent } from './app.component';
-import { ContactListComponent } from './contactlist/contact-list/contact-list';
-import { ContactDetailsComponent } from './contactlist/contact-details/contact-details';
+import { ContactListComponent } from './contactlist/contact-list/contact-list.component';
+import { ContactDetailsComponent } from './contactlist/contact-details/contact-details.component';
 @NgModule({
     declarations: [
         AppComponent,

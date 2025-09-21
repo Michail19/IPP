@@ -1,8 +1,9 @@
-export class Contact {
-  _id?: string;
-  username: string;
+export interface Contact {
+  _id: string;
+  name: string;
   email: string;
-  telephone: {
+  phone: {
+    work: string;
     mobile: string;
-    home: string;
-  }}
+  };
+}
