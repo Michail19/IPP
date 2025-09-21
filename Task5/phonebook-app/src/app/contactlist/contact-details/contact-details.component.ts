@@ -3,8 +3,8 @@ import { Contact } from '../contact';
 import { ContactService } from '../contact.service';
 @Component({
   selector: 'contact-details',
-  templateUrl: './contact-details.html',
-  styleUrls: ['./contact-details.css']
+  templateUrl: './contact-details.component.html',
+  styleUrls: ['./contact-details.component.css']
 })
 export class ContactDetailsComponent {
   @Input()
