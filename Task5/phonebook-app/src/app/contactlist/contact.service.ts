@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, catchError } from 'rxjs';
+import {throwError, Observable, catchError, of} from 'rxjs';
 import { Contact } from './contact';
 
 @Injectable({
@@ -47,7 +47,8 @@ export class ContactService {
   private handleError<T>(operation = 'operation', result?: T) {
     return (error: any): Observable<T> => {
       console.error(`${operation} failed: ${error.message}`);
-      return result as T; // возвращаем "пустой" результат, чтобы не падало приложение
+      // Если передан результат — возвращаем Observable с ним, иначе — выбрасываем ошибку
+      return result !== undefined ? of(result) : throwError(() => error);
     };
   }
 }

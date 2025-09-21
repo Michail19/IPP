@@ -6,18 +6,17 @@ import { HttpClientModule } from '@angular/common/http';
 import { AppComponent } from './app.component';
 import { ContactListComponent } from './contactlist/contact-list/contact-list.component';
 import { ContactDetailsComponent } from './contactlist/contact-details/contact-details.component';
+
 @NgModule({
-    declarations: [
-        AppComponent,
-        ContactDetailsComponent,
-        ContactListComponent
-    ],
-    imports: [
-        BrowserModule,
-        FormsModule,
-      HttpClientModule
-    ],
-    providers: [],
-    bootstrap: [AppComponent]
+  imports: [
+    BrowserModule,
+    FormsModule,
+    HttpClientModule,
+    AppComponent,              // <-- импорт вместо declarations
+    ContactListComponent,
+    ContactDetailsComponent
+  ],
+  providers: [],
+  bootstrap: [AppComponent]
 })
-export class AppModule { }
+export class AppModule {}

@@ -1,9 +1,13 @@
 import { Component, Input } from '@angular/core';
 import { Contact } from '../contact';
+import { CommonModule } from '@angular/common'; // для ngIf, ngFor
+import { FormsModule } from '@angular/forms';   // для ngModel
 import { ContactService } from '../contact.service';
 
 @Component({
   selector: 'contact-details',
+  standalone: true,
+  imports: [CommonModule, FormsModule],
   templateUrl: './contact-details.component.html',
   styleUrls: ['./contact-details.component.css']
 })
