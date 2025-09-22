@@ -1,7 +1,11 @@
-const express = require("express");
-const path = require("path");
-const bodyParser = require("body-parser");
-const { MongoClient, ObjectId } = require("mongodb");
+import express from "express";
+import path from "path";
+import { fileURLToPath } from "url";
+import { MongoClient, ObjectId } from "mongodb";
+import bodyParser from "express";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 app.use(bodyParser.json());
@@ -9,32 +13,25 @@ app.use(bodyParser.json());
 // ===== MongoDB =====
 const uri = process.env.MONGODB_URI || "mongodb://localhost:27017/test";
 
-async function startServer() {
-  console.log("URI:", process.env.MONGODB_URI); // проверь вывод
+console.log("URI:", process.env.MONGODB_URI); // проверь вывод
 
-  try {
-    const client = new MongoClient(process.env.MONGODB_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-      tls: true,
-      tlsAllowInvalidCertificates: true
-    });
+try {
+  const client = new MongoClient(process.env.MONGODB_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    tls: true,
+    tlsAllowInvalidCertificates: true
+  });
 
-    await client.connect();
-    const db = client.db("Cluster0"); // или имя базы
-    console.log("База данных подключена")
+  await client.connect();
+  const db = client.db("Cluster0"); // или имя базы
+  console.log("База данных подключена")
 
-    app.locals.db = db;
-
-    const PORT = process.env.PORT || 8080;
-    app.listen(PORT, () => console.log("Приложение запущено на порту", PORT));
-  } catch (err) {
-    console.error("Ошибка подключения к MongoDB:", err);
-    process.exit(1);
-  }
+  app.locals.db = db;
+} catch (err) {
+  console.error("Ошибка подключения к MongoDB:", err);
+  process.exit(1);
 }
-
-startServer();
 
 // ===== API =====
 
@@ -99,24 +96,27 @@ app.put("/api/contacts/:id", async (req, res) => {
 app.delete("/api/contacts/:id", async (req, res) => {
   const db = req.app.locals.db;
   try {
-    const result = await db.collection(CONTACTS_COLLECTION).deleteOne({ _id: new ObjectId(req.params.id) });
-    if (result.deletedCount === 0) return res.status(404).json({ error: "Контакт не найден" });
-    res.status(200).json({ _id: req.params.id });
+    const result = await db.collection(CONTACTS_COLLECTION).deleteOne({_id: new ObjectId(req.params.id)});
+    if (result.deletedCount === 0) return res.status(404).json({error: "Контакт не найден"});
+    res.status(200).json({_id: req.params.id});
   } catch (err) {
-    res.status(500).json({ error: "Не удалось удалить контакт" });
+    res.status(500).json({error: "Не удалось удалить контакт"});
   }
+});
 
 // ===== Angular Frontend =====
-const distPath = path.join(__dirname, "../dist/phonebook-app");
+const distPath = path.join(__dirname, "../dist/phonebook-app/browser");
+
 app.use(express.static(distPath));
 
-// Все остальные маршруты → index.html (SPA fallback)
+// SPA fallback: все остальные маршруты → index.html
 app.get("*", (req, res) => {
   res.sendFile(path.join(distPath, "index.html"));
 });
 
-// ===== Server Start =====
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Server listening on port ${PORT}`);
-});
+app.listen(PORT, () => console.log(`Server listening on port ${PORT}`));
+
+import fs from "fs";
+console.log("Содержимое dist/phonebook-app/browser:", fs.readdirSync(path.join(__dirname, "../dist/phonebook-app/browser")));
+
