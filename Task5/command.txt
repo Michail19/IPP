@@ -1,0 +1,2 @@
+curl -X GET https://task5-ipp.onrender.com/api/contacts
+curl -X POST https://task5-ipp.onrender.com/api/contacts -H "Content-Type: application/json; charset=utf-8" --data-binary @data.json
