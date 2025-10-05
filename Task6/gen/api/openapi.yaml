@@ -1,0 +1,708 @@
+openapi: 3.0.0
+info:
+  description: "API for an online computer game store. Allows browsing games, user\
+    \ registration, and purchasing."
+  title: GamerHub Store API
+  version: 1.0.0
+servers:
+- description: Development mock server
+  url: http://localhost:4010
+paths:
+  /games:
+    get:
+      description: "Returns a list of games, optionally filtered by genre or developer."
+      parameters:
+      - description: "Filter games by genre (e.g., 'RPG', 'Action')"
+        explode: true
+        in: query
+        name: genre
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Filter games by developer name
+        explode: true
+        in: query
+        name: developer
+        required: false
+        schema:
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Game'
+                type: array
+          description: Successful operation
+        "500":
+          description: Internal server error
+      summary: Get a list of all games
+      tags:
+      - Games
+      x-accepts:
+      - application/json
+    post:
+      description: |
+        Creates a new game in the catalog. Requires admin privileges.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GameCreate'
+        description: Game object that needs to be added to the store
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Game'
+          description: Game successfully created
+          headers:
+            Location:
+              description: URL of the created game
+              explode: false
+              schema:
+                example: http://localhost:4010/games/42
+                format: uri
+                type: string
+              style: simple
+        "400":
+          description: Invalid input
+        "401":
+          description: Unauthorized - Missing or invalid token
+        "403":
+          description: Forbidden - User is not an admin
+        "500":
+          description: Internal server error
+      security:
+      - BearerAuth: []
+      summary: Add a new game to the store (Admin only)
+      tags:
+      - Games
+      x-content-type: application/json
+      x-accepts:
+      - application/json
+  /games/{gameId}:
+    delete:
+      description: Deletes a specific game by ID. Requires admin privileges.
+      parameters:
+      - description: ID of the game to delete
+        explode: false
+        in: path
+        name: gameId
+        required: true
+        schema:
+          example: 42
+          format: int64
+          type: integer
+        style: simple
+      responses:
+        "204":
+          description: Game successfully deleted (no content returned)
+        "401":
+          description: Unauthorized - Missing or invalid token
+        "403":
+          description: Forbidden - User is not an admin
+        "404":
+          description: Game not found
+        "500":
+          description: Internal server error
+      security:
+      - BearerAuth: []
+      summary: Delete a game from the catalog (Admin only)
+      tags:
+      - Games
+      x-accepts:
+      - application/json
+    get:
+      description: Returns detailed information about a single game.
+      parameters:
+      - description: Numeric ID of the game to retrieve.
+        explode: false
+        in: path
+        name: gameId
+        required: true
+        schema:
+          format: int64
+          type: integer
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Game'
+          description: Successful operation. Game found and returned.
+        "400":
+          description: "Bad Request - Invalid ID supplied (e.g., not a number)."
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/_games__gameId__get_404_response'
+          description: Game not found. No game exists with the provided ID.
+        "500":
+          description: Internal Server Error
+      summary: Get a game by its ID
+      tags:
+      - Games
+      x-accepts:
+      - application/json
+    put:
+      description: Updates the details of a specific game by ID. Requires admin privileges.
+      parameters:
+      - description: ID of the game to update
+        explode: false
+        in: path
+        name: gameId
+        required: true
+        schema:
+          example: 42
+          format: int64
+          type: integer
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GameUpdate'
+        description: Updated game object
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Game'
+          description: Game successfully updated
+        "400":
+          description: Invalid input or ID
+        "401":
+          description: Unauthorized - Missing or invalid token
+        "403":
+          description: Forbidden - User is not an admin
+        "404":
+          description: Game not found
+        "500":
+          description: Internal server error
+      security:
+      - BearerAuth: []
+      summary: Update an existing game (Admin only)
+      tags:
+      - Games
+      x-content-type: application/json
+      x-accepts:
+      - application/json
+  /users/register:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCreate'
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: User successfully created
+        "400":
+          description: "Invalid input (e.g., email already exists, username taken)"
+        "500":
+          description: Internal server error
+      summary: Register a new user
+      tags:
+      - Users
+      x-content-type: application/json
+      x-accepts:
+      - application/json
+  /users/login:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/_users_login_post_request'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/_users_login_post_200_response'
+          description: Successful login
+        "401":
+          description: Unauthorized - Invalid email or password
+        "500":
+          description: Internal server error
+      summary: Authenticate a user and receive a JWT token
+      tags:
+      - Users
+      x-content-type: application/json
+      x-accepts:
+      - application/json
+  /users/{userId}:
+    get:
+      description: "Returns user profile information. \nRegular users can only retrieve\
+        \ their own profile. \nAdministrators can retrieve any user's profile.\n"
+      parameters:
+      - description: ID of the user to retrieve
+        explode: false
+        in: path
+        name: userId
+        required: true
+        schema:
+          example: 10
+          format: int64
+          type: integer
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: Successful operation
+        "401":
+          description: Unauthorized - Missing or invalid token
+        "403":
+          description: Forbidden - User tried to access another user's profile without
+            admin rights
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/_games__gameId__get_404_response'
+          description: User not found
+        "500":
+          description: Internal server error
+      security:
+      - BearerAuth: []
+      summary: Get user profile by ID
+      tags:
+      - Users
+      x-accepts:
+      - application/json
+  /users/{userId}/orders:
+    get:
+      description: |
+        Returns the order history for a specific user.
+        Regular users can only view their own orders.
+        Administrators can view any user's orders.
+      parameters:
+      - description: ID of the user whose orders to retrieve
+        explode: false
+        in: path
+        name: userId
+        required: true
+        schema:
+          example: 10
+          format: int64
+          type: integer
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Order'
+                type: array
+          description: Successful operation
+        "401":
+          description: Unauthorized - Missing or invalid token
+        "403":
+          description: Forbidden - User tried to access another user's orders without
+            admin rights
+        "404":
+          description: User not found
+        "500":
+          description: Internal server error
+      security:
+      - BearerAuth: []
+      summary: Get user's order history
+      tags:
+      - Users
+      - Orders
+      x-accepts:
+      - application/json
+  /orders:
+    get:
+      description: |
+        Returns a list of all orders in the system.
+        Requires administrator privileges.
+      parameters:
+      - description: Filter orders by status
+        explode: true
+        in: query
+        name: status
+        required: false
+        schema:
+          enum:
+          - pending
+          - completed
+          - cancelled
+          type: string
+        style: form
+      - description: Filter orders by user ID
+        explode: true
+        in: query
+        name: userId
+        required: false
+        schema:
+          format: int64
+          type: integer
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Order'
+                type: array
+          description: Successful operation
+        "401":
+          description: Unauthorized - Missing or invalid token
+        "403":
+          description: Forbidden - User is not an admin
+        "500":
+          description: Internal server error
+      security:
+      - BearerAuth: []
+      summary: Get all orders (Admin only)
+      tags:
+      - Orders
+      x-accepts:
+      - application/json
+    post:
+      description: |
+        Creates a new order for the authenticated user.
+        The user will be automatically determined from the JWT token.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderCreate'
+        description: Order creation data
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+          description: Order successfully created
+          headers:
+            Location:
+              description: URL of the created order
+              explode: false
+              schema:
+                format: uri
+                type: string
+              style: simple
+        "400":
+          description: "Invalid input - e.g., empty game list, invalid game IDs"
+        "401":
+          description: Unauthorized - Missing or invalid token
+        "404":
+          description: One or more games not found
+        "500":
+          description: Internal server error
+      security:
+      - BearerAuth: []
+      summary: Create a new order
+      tags:
+      - Orders
+      x-content-type: application/json
+      x-accepts:
+      - application/json
+  /orders/{orderId}:
+    get:
+      description: |
+        Returns detailed information about a specific order.
+        Users can only view their own orders.
+        Administrators can view any order.
+      parameters:
+      - description: ID of the order to retrieve
+        explode: false
+        in: path
+        name: orderId
+        required: true
+        schema:
+          example: 1001
+          format: int64
+          type: integer
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+          description: Successful operation
+        "401":
+          description: Unauthorized - Missing or invalid token
+        "403":
+          description: Forbidden - User tried to access another user's order without
+            admin rights
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/_games__gameId__get_404_response'
+          description: Order not found
+        "500":
+          description: Internal server error
+      security:
+      - BearerAuth: []
+      summary: Get order by ID
+      tags:
+      - Orders
+      x-accepts:
+      - application/json
+components:
+  schemas:
+    Game:
+      example:
+        releaseDate: 2000-01-23
+        price: 0.08008282
+        imageUrl: https://openapi-generator.tech
+        genre: genre
+        description: description
+        developer: developer
+        id: 42
+        title: title
+      properties:
+        id:
+          example: 42
+          format: int64
+          readOnly: true
+          type: integer
+        title:
+          type: string
+        description:
+          type: string
+        price:
+          format: float
+          minimum: 0
+          type: number
+        genre:
+          type: string
+        releaseDate:
+          format: date
+          type: string
+        developer:
+          type: string
+        imageUrl:
+          format: uri
+          type: string
+      required:
+      - price
+      - title
+      type: object
+    GameCreate:
+      example:
+        releaseDate: 2000-01-23
+        price: 0.08008282
+        imageUrl: https://openapi-generator.tech
+        genre: genre
+        description: description
+        publisher: publisher
+        developer: developer
+        title: title
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        price:
+          format: float
+          minimum: 0
+          type: number
+        genre:
+          type: string
+        releaseDate:
+          format: date
+          type: string
+        developer:
+          type: string
+        publisher:
+          type: string
+        imageUrl:
+          format: uri
+          type: string
+      required:
+      - price
+      - title
+      type: object
+    GameUpdate:
+      example:
+        price: 0.08008282
+        imageUrl: https://openapi-generator.tech
+        genre: genre
+        description: description
+        publisher: publisher
+        developer: developer
+        title: title
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        price:
+          format: float
+          minimum: 0
+          type: number
+        genre:
+          type: string
+        developer:
+          type: string
+        publisher:
+          type: string
+        imageUrl:
+          format: uri
+          type: string
+      type: object
+    User:
+      example:
+        role: user
+        id: 0
+        email: email
+        username: username
+      properties:
+        id:
+          format: int64
+          readOnly: true
+          type: integer
+        username:
+          type: string
+        email:
+          format: email
+          type: string
+        role:
+          default: user
+          enum:
+          - user
+          - admin
+          type: string
+      type: object
+    UserCreate:
+      example:
+        password: password
+        email: email
+        username: username
+      properties:
+        username:
+          type: string
+        email:
+          format: email
+          type: string
+        password:
+          format: password
+          type: string
+          writeOnly: true
+      required:
+      - email
+      - password
+      - username
+      type: object
+    Order:
+      example:
+        gameIds:
+        - 1
+        - 1
+        totalAmount: 0.5962134
+        createdAt: 2000-01-23T04:56:07.000+00:00
+        id: 0
+        userId: 6
+        status: pending
+      properties:
+        id:
+          format: int64
+          readOnly: true
+          type: integer
+        userId:
+          format: int64
+          type: integer
+        gameIds:
+          items:
+            format: int64
+            type: integer
+          type: array
+        totalAmount:
+          format: float
+          minimum: 0
+          type: number
+        status:
+          enum:
+          - pending
+          - completed
+          - cancelled
+          type: string
+        createdAt:
+          format: date-time
+          readOnly: true
+          type: string
+      type: object
+    OrderCreate:
+      example:
+        gameIds:
+        - 0
+        - 0
+      properties:
+        gameIds:
+          description: Array of game IDs to purchase
+          items:
+            format: int64
+            type: integer
+          minItems: 1
+          type: array
+      required:
+      - gameIds
+      type: object
+    _games__gameId__get_404_response:
+      example:
+        message: message
+      properties:
+        message:
+          type: string
+      type: object
+    _users_login_post_request:
+      properties:
+        email:
+          format: email
+          type: string
+        password:
+          format: password
+          type: string
+      required:
+      - email
+      - password
+      type: object
+    _users_login_post_200_response:
+      example:
+        user:
+          role: user
+          id: 0
+          email: email
+          username: username
+        token: token
+      properties:
+        token:
+          type: string
+        user:
+          $ref: '#/components/schemas/User'
+      type: object
+  securitySchemes:
+    BearerAuth:
+      bearerFormat: JWT
+      scheme: bearer
+      type: http
+

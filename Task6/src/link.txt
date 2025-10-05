@@ -1,1 +1,5 @@
 https://editor.swagger.io/
+
+npm install -g @stoplight/prism-cli
+
+prism mock ./code.yaml
