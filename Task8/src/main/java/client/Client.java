@@ -15,7 +15,7 @@ public class Client {
     }
 
     public void start() {
-        System.out.println("=== Shopping List Manager ===");
+        System.out.println("=== Менеджер списка покупок ===");
 
         while (true) {
             printMenu();
@@ -41,137 +41,137 @@ public class Client {
                     markAsPurchased();
                     break;
                 case "0":
-                    System.out.println("Goodbye!");
+                    System.out.println("До свидания!");
                     return;
                 default:
-                    System.out.println("Invalid choice. Please try again.");
+                    System.out.println("Неверный выбор. Пожалуйста, попробуйте снова.");
             }
         }
     }
 
     private void printMenu() {
-        System.out.println("\nChoose an option:");
-        System.out.println("1. Create product");
-        System.out.println("2. List all products");
-        System.out.println("3. Get product by ID");
-        System.out.println("4. Update product");
-        System.out.println("5. Delete product");
-        System.out.println("6. Mark product as purchased");
-        System.out.println("0. Exit");
-        System.out.print("Enter your choice: ");
+        System.out.println("\nВыберите опцию:");
+        System.out.println("1. Создать продукт");
+        System.out.println("2. Показать все продукты");
+        System.out.println("3. Получить продукт по ID");
+        System.out.println("4. Обновить продукт");
+        System.out.println("5. Удалить продукт");
+        System.out.println("6. Отметить продукт как купленный");
+        System.out.println("0. Выход");
+        System.out.print("Введите ваш выбор: ");
     }
 
     private void createProduct() {
-        System.out.print("Enter product name: ");
+        System.out.print("Введите название продукта: ");
         String name = scanner.nextLine().trim();
 
-        System.out.print("Enter quantity: ");
+        System.out.print("Введите количество: ");
         int quantity = Integer.parseInt(scanner.nextLine().trim());
 
-        System.out.print("Enter category: ");
+        System.out.print("Введите категорию: ");
         String category = scanner.nextLine().trim();
 
         try {
             ProductResponse response = client.createProduct(name, quantity, category);
-            System.out.println("Product created successfully:");
+            System.out.println("Продукт успешно создан:");
             printProduct(response);
         } catch (Exception e) {
-            System.err.println("Error creating product: " + e.getMessage());
+            System.err.println("Ошибка при создании продукта: " + e.getMessage());
         }
     }
 
     private void listProducts() {
-        System.out.print("Include purchased products? (y/n): ");
-        boolean includePurchased = scanner.nextLine().trim().equalsIgnoreCase("y");
+        System.out.print("Включая купленные продукты? (д/н): ");
+        boolean includePurchased = scanner.nextLine().trim().equalsIgnoreCase("д");
 
         try {
             List<ProductResponse> products = client.getAllProducts(includePurchased);
             if (products.isEmpty()) {
-                System.out.println("No products found.");
+                System.out.println("Продукты не найдены.");
             } else {
-                System.out.println("Products:");
+                System.out.println("Продукты:");
                 for (ProductResponse product : products) {
                     printProduct(product);
                     System.out.println("---");
                 }
             }
         } catch (Exception e) {
-            System.err.println("Error listing products: " + e.getMessage());
+            System.err.println("Ошибка при выводе списка продуктов: " + e.getMessage());
         }
     }
 
     private void getProduct() {
-        System.out.print("Enter product ID: ");
+        System.out.print("Введите ID продукта: ");
         String id = scanner.nextLine().trim();
 
         try {
             ProductResponse product = client.getProduct(id);
-            System.out.println("Product found:");
+            System.out.println("Продукт найден:");
             printProduct(product);
         } catch (Exception e) {
-            System.err.println("Error getting product: " + e.getMessage());
+            System.err.println("Ошибка при получении продукта: " + e.getMessage());
         }
     }
 
     private void updateProduct() {
-        System.out.print("Enter product ID to update: ");
+        System.out.print("Введите ID продукта для обновления: ");
         String id = scanner.nextLine().trim();
 
-        System.out.print("Enter new name: ");
+        System.out.print("Введите новое название: ");
         String name = scanner.nextLine().trim();
 
-        System.out.print("Enter new quantity: ");
+        System.out.print("Введите новое количество: ");
         int quantity = Integer.parseInt(scanner.nextLine().trim());
 
-        System.out.print("Enter new category: ");
+        System.out.print("Введите новую категорию: ");
         String category = scanner.nextLine().trim();
 
         try {
             ProductResponse response = client.updateProduct(id, name, quantity, category);
-            System.out.println("Product updated successfully:");
+            System.out.println("Продукт успешно обновлен:");
             printProduct(response);
         } catch (Exception e) {
-            System.err.println("Error updating product: " + e.getMessage());
+            System.err.println("Ошибка при обновлении продукта: " + e.getMessage());
         }
     }
 
     private void deleteProduct() {
-        System.out.print("Enter product ID to delete: ");
+        System.out.print("Введите ID продукта для удаления: ");
         String id = scanner.nextLine().trim();
 
         try {
             boolean success = client.deleteProduct(id);
             if (success) {
-                System.out.println("Product deleted successfully.");
+                System.out.println("Продукт успешно удален.");
             } else {
-                System.out.println("Product not found.");
+                System.out.println("Продукт не найден.");
             }
         } catch (Exception e) {
-            System.err.println("Error deleting product: " + e.getMessage());
+            System.err.println("Ошибка при удалении продукта: " + e.getMessage());
         }
     }
 
     private void markAsPurchased() {
-        System.out.print("Enter product ID to mark as purchased: ");
+        System.out.print("Введите ID продукта для отметки как купленный: ");
         String id = scanner.nextLine().trim();
 
         try {
             ProductResponse response = client.markAsPurchased(id);
-            System.out.println("Product marked as purchased:");
+            System.out.println("Продукт отмечен как купленный:");
             printProduct(response);
         } catch (Exception e) {
-            System.err.println("Error marking product as purchased: " + e.getMessage());
+            System.err.println("Ошибка при отметке продукта как купленного: " + e.getMessage());
         }
     }
 
     private void printProduct(ProductResponse product) {
         System.out.printf("ID: %s\n", product.getId());
-        System.out.printf("Name: %s\n", product.getName());
-        System.out.printf("Quantity: %d\n", product.getQuantity());
-        System.out.printf("Category: %s\n", product.getCategory());
-        System.out.printf("Purchased: %s\n", product.getPurchased() ? "Yes" : "No");
-        System.out.printf("Created: %s\n", product.getCreatedAt());
-        System.out.printf("Updated: %s\n", product.getUpdatedAt());
+        System.out.printf("Название: %s\n", product.getName());
+        System.out.printf("Количество: %d\n", product.getQuantity());
+        System.out.printf("Категория: %s\n", product.getCategory());
+        System.out.printf("Куплен: %s\n", product.getPurchased() ? "Да" : "Нет");
+        System.out.printf("Создан: %s\n", product.getCreatedAt());
+        System.out.printf("Обновлен: %s\n", product.getUpdatedAt());
     }
 
     public static void main(String[] args) {

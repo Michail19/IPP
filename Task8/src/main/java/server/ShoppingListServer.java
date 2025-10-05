@@ -20,10 +20,10 @@ public class ShoppingListServer {
                 .build()
                 .start();
 
-        System.out.println("Server started, listening on port " + port);
+        System.out.println("Сервер запущен на порту " + port);
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            System.err.println("Shutting down gRPC server");
+            System.err.println("Завершение работы сервера gRPC");
             try {
                 stop();
             } catch (InterruptedException e) {

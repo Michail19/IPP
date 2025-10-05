@@ -73,7 +73,7 @@ public class ShoppingListClient {
 
                 @Override
                 public void onError(Throwable t) {
-                    System.err.println("Error streaming products: " + t.getMessage());
+                    System.err.println("Ошибка передачи продуктов: " + t.getMessage());
                     finishLatch.countDown();
                 }
 
@@ -86,7 +86,7 @@ public class ShoppingListClient {
             finishLatch.await(5, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            System.err.println("Interrupted while waiting for products");
+            System.err.println("Прервано во время ожидания продуктов");
         }
 
         return products;

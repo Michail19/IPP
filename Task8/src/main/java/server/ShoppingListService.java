@@ -28,10 +28,10 @@ public class ShoppingListService extends ShoppingListServiceGrpc.ShoppingListSer
             responseObserver.onNext(response);
             responseObserver.onCompleted();
 
-            System.out.println("Created product: " + product);
+            System.out.println("Создан продукт: " + product);
         } catch (Exception e) {
             responseObserver.onError(Status.INTERNAL
-                    .withDescription("Error creating product: " + e.getMessage())
+                    .withDescription("Ошибка при создании продукта: " + e.getMessage())
                     .asRuntimeException());
         }
     }
@@ -41,7 +41,7 @@ public class ShoppingListService extends ShoppingListServiceGrpc.ShoppingListSer
         Product product = products.get(request.getId());
         if (product == null) {
             responseObserver.onError(Status.NOT_FOUND
-                    .withDescription("Product not found with id: " + request.getId())
+                    .withDescription("Продукт не найден с id: " + request.getId())
                     .asRuntimeException());
             return;
         }
@@ -62,7 +62,7 @@ public class ShoppingListService extends ShoppingListServiceGrpc.ShoppingListSer
             responseObserver.onCompleted();
         } catch (Exception e) {
             responseObserver.onError(Status.INTERNAL
-                    .withDescription("Error retrieving products: " + e.getMessage())
+                    .withDescription("Ошибка при получении продуктов: " + e.getMessage())
                     .asRuntimeException());
         }
     }
@@ -72,7 +72,7 @@ public class ShoppingListService extends ShoppingListServiceGrpc.ShoppingListSer
         Product product = products.get(request.getId());
         if (product == null) {
             responseObserver.onError(Status.NOT_FOUND
-                    .withDescription("Product not found with id: " + request.getId())
+                    .withDescription("Продукт не найден с id: " + request.getId())
                     .asRuntimeException());
             return;
         }
@@ -87,10 +87,10 @@ public class ShoppingListService extends ShoppingListServiceGrpc.ShoppingListSer
             responseObserver.onNext(response);
             responseObserver.onCompleted();
 
-            System.out.println("Updated product: " + product);
+            System.out.println("Обновлен продукт: " + product);
         } catch (Exception e) {
             responseObserver.onError(Status.INTERNAL
-                    .withDescription("Error updating product: " + e.getMessage())
+                    .withDescription("Ошибка при обновлении продукта: " + e.getMessage())
                     .asRuntimeException());
         }
     }
@@ -101,14 +101,14 @@ public class ShoppingListService extends ShoppingListServiceGrpc.ShoppingListSer
         if (removed == null) {
             responseObserver.onNext(DeleteProductResponse.newBuilder()
                     .setSuccess(false)
-                    .setMessage("Product not found with id: " + request.getId())
+                    .setMessage("Продукт не найден с id: " + request.getId())
                     .build());
         } else {
             responseObserver.onNext(DeleteProductResponse.newBuilder()
                     .setSuccess(true)
-                    .setMessage("Product deleted successfully")
+                    .setMessage("Продукт успешно удален")
                     .build());
-            System.out.println("Deleted product: " + removed);
+            System.out.println("Удален продукт: " + removed);
         }
         responseObserver.onCompleted();
     }
@@ -118,7 +118,7 @@ public class ShoppingListService extends ShoppingListServiceGrpc.ShoppingListSer
         Product product = products.get(request.getId());
         if (product == null) {
             responseObserver.onError(Status.NOT_FOUND
-                    .withDescription("Product not found with id: " + request.getId())
+                    .withDescription("Продукт не найден с id: " + request.getId())
                     .asRuntimeException());
             return;
         }
@@ -130,7 +130,7 @@ public class ShoppingListService extends ShoppingListServiceGrpc.ShoppingListSer
         responseObserver.onNext(response);
         responseObserver.onCompleted();
 
-        System.out.println("Marked as purchased: " + product);
+        System.out.println("Отмечен как купленный: " + product);
     }
 
     private ProductResponse convertToProductResponse(Product product) {
